@@ -20,9 +20,9 @@ local function extractItemFromLoot(message)
 end
 
 local function extractMultiplierFromLoot(message)
-    _, e = string.find(message, "%]x")
+    _, e = string.find(message, "x%d")
     if e then
-        return tonumber(string.sub(message, e+1, e+1))
+        return tonumber(string.sub(message, e, e))
     else
         return 1
     end
@@ -68,7 +68,9 @@ local function clearRecords()
     end
 end
 -------------------
-
+--local test = extractMultiplierFromLoot("You create: [Super Mana Potion]x2.")
+--print(test)
+--print(test+5)
 --EventHandler: Where Data is taken from the game
 local frame = CreateFrame('Frame', 'ProcCounterFrame', UIParent)
 frame:RegisterEvent("CHAT_MSG_LOOT")
@@ -77,7 +79,9 @@ frame:SetScript("OnEvent", function (self, event, ...)
     local text, playerName, itemName, searchResult, procMultiplier
     if event == "CHAT_MSG_LOOT" then
         text, _, _, _, playerName = ...
-        if string.find(text, "Elixir") or string.find(text, "Flask") or string.find(text, "Bandage") then
+        if (not string.find(text, "create")) then return
+        end
+        if string.find(text, "Elixir") or string.find(text, "Flask") or string.find(text, "Potion") then
             itemName = extractItemFromLoot(text)
             procMultiplier = extractMultiplierFromLoot(text)
             searchResult = searchRecords(playerName, itemName)
@@ -100,7 +104,6 @@ frame:SetScript("OnEvent", function (self, event, ...)
         itemName = extractItemFromTradeskill(text)
         searchResult = searchRecords(playerName, itemName)
         if searchResult then
-            print("Search Result Found. Increasing Number of Crafts")
             searchResult:increaseNumCrafts()
         end
     else
