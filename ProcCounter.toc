@@ -1,0 +1,8 @@
+## Interface: 20504
+## Title: ProcCounter
+## Author: Relreo
+## Version: 0.1beta
+## Notes: Proc Counter for Alchemy Specializations
+
+PCCraftingRecord.lua
+main.lua
