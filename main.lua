@@ -115,5 +115,7 @@ SlashCmdList["PROCCOUNTER"] = function (msg)
         for i = 1, numRecords do
             print(records[i]:getPrintableFormat())
         end
+    else
+        print("Proc Counter: NO DATA FOUND")
     end
 end
