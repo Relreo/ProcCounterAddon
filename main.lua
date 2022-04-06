@@ -1,13 +1,9 @@
 print("ProcCounter by Relreo loaded.")
-
+local errorText = "Invalid Command. Target someone or use /pcr [Player Name] or /pcreport [Player Name]."
 local maxNumRecords = 100
 local records = {}
 
 ----------------- Helper functions
--- MESSAGE FORMAT ---> {Name} create(s): [{ItemName}]{multiplier}.
--- Examples: 
--- Deathwind creates: [Elixir of Draenic Wisdom]x3.
--- You create: [Haste Potion]x5.
 local function extractUsername(message)
     i, _ = string.find(message, " ")
     return string.sub(message, 1, i-1)
@@ -68,9 +64,6 @@ local function clearRecords()
     end
 end
 -------------------
---local test = extractMultiplierFromLoot("You create: [Super Mana Potion]x2.")
---print(test)
---print(test+5)
 --EventHandler: Where Data is taken from the game
 local frame = CreateFrame('Frame', 'ProcCounterFrame', UIParent)
 frame:RegisterEvent("CHAT_MSG_LOOT")
@@ -110,9 +103,10 @@ frame:SetScript("OnEvent", function (self, event, ...)
         return
     end
 end)
+-------------------
 
-local errorText = "Invalid Command. Target someone or use /pcr [Player Name] or /pcreport [Player Name]."
--- Slash command to report results in chat for user. If a player name is included it filters results to only that player's crafts
+-- Slash command to report results in chat for user. If a player name is included it filters results to only that player's crafts. 
+-- If no name is included but the user is targeting a player, it will try to use the targets name as a filter
 SLASH_PROCCOUNTER1 = "/pcreport"
 SLASH_PROCCOUNTER2 = "/pcr"
 SlashCmdList["PROCCOUNTER"] = function (msg) 
@@ -130,6 +124,62 @@ SlashCmdList["PROCCOUNTER"] = function (msg)
             elseif msg == '' and not target then
                 matchFound = true
                 print(records[i]:getPrintableFormat())
+            else
+            end
+        end
+
+        if not matchFound then print(errorText) end
+
+    else
+        print("Proc Counter: NO DATA FOUND")
+    end
+end
+-- Allows for reporting of results to Party Chat
+SLASH_PROCCOUNTERPARTY1 = "/pcreportparty"
+SLASH_PROCCOUNTERPARTY2 = "/pcrp"
+SlashCmdList["PROCCOUNTERPARTY"] = function (msg) 
+    local target = UnitName("target")
+    numRecords = table.getn(records)
+    if numRecords > 0 then
+        local matchFound = false
+        for i = 1, numRecords do
+            if msg ~= '' and string.lower(records[i]:getCrafter()) == string.lower(msg) then 
+                matchFound = true
+                records[i]:printToParty()
+            elseif target and msg == '' and string.lower(records[i]:getCrafter()) == string.lower(target) then
+                matchFound = true
+                records[i]:printToParty()
+            elseif msg == '' and not target then
+                matchFound = true
+                records[i]:printToParty()
+            else
+            end
+        end
+
+        if not matchFound then print(errorText) end
+
+    else
+        print("Proc Counter: NO DATA FOUND")
+    end
+end
+-- Allows for reporting of results to Raid Chat
+SLASH_PROCCOUNTERRAID1 = "/pcreportraid"
+SLASH_PROCCOUNTERRAID2 = "/pcrr"
+SlashCmdList["PROCCOUNTERRAID"] = function (msg) 
+    local target = UnitName("target")
+    numRecords = table.getn(records)
+    if numRecords > 0 then
+        local matchFound = false
+        for i = 1, numRecords do
+            if msg ~= '' and string.lower(records[i]:getCrafter()) == string.lower(msg) then 
+                matchFound = true
+                records[i]:printToRaid()
+            elseif target and msg == '' and string.lower(records[i]:getCrafter()) == string.lower(target) then
+                matchFound = true
+                records[i]:printToRaid()
+            elseif msg == '' and not target then
+                matchFound = true
+                records[i]:printToRaid()
             else
             end
         end
