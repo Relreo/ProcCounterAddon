@@ -8,6 +8,10 @@ PCCraftingRecord = {
 ---------------------------
 
 -- PCCraftingRecord Methods
+function PCCraftingRecord:getCrafter()
+    return self.crafter
+end
+
 function PCCraftingRecord:increaseNumCrafts()
     self.numCrafts = self.numCrafts + 1
 end

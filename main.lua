@@ -81,7 +81,7 @@ frame:SetScript("OnEvent", function (self, event, ...)
         text, _, _, _, playerName = ...
         if (not string.find(text, "create")) then return
         end
-        if string.find(text, "Elixir") or string.find(text, "Flask") or string.find(text, "Potion") then
+        if string.find(text, "Elixir") or string.find(text, "Flask") or string.find(text, "Potion") or string.find(text, "Bandage") or string.find(text, "Arthas") then
             itemName = extractItemFromLoot(text)
             procMultiplier = extractMultiplierFromLoot(text)
             searchResult = searchRecords(playerName, itemName)
@@ -111,13 +111,31 @@ frame:SetScript("OnEvent", function (self, event, ...)
     end
 end)
 
+local errorText = "Invalid Command. Target someone or use /pcr [Player Name] or /pcreport [Player Name]."
+-- Slash command to report results in chat for user. If a player name is included it filters results to only that player's crafts
 SLASH_PROCCOUNTER1 = "/pcreport"
+SLASH_PROCCOUNTER2 = "/pcr"
 SlashCmdList["PROCCOUNTER"] = function (msg) 
+    local target = UnitName("target")
     numRecords = table.getn(records)
     if numRecords > 0 then
+        local matchFound = false
         for i = 1, numRecords do
-            print(records[i]:getPrintableFormat())
+            if msg ~= '' and string.lower(records[i]:getCrafter()) == string.lower(msg) then 
+                matchFound = true
+                print(records[i]:getPrintableFormat())
+            elseif target and msg == '' and string.lower(records[i]:getCrafter()) == string.lower(target) then
+                matchFound = true
+                print(records[i]:getPrintableFormat())
+            elseif msg == '' and not target then
+                matchFound = true
+                print(records[i]:getPrintableFormat())
+            else
+            end
         end
+
+        if not matchFound then print(errorText) end
+
     else
         print("Proc Counter: NO DATA FOUND")
     end
